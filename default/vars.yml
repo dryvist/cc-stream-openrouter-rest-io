@@ -1,0 +1,18 @@
+openrouter_api_base_url:
+  type: string
+  lib: custom
+  description: OpenRouter API base URL
+  value: "'https://openrouter.ai/api/v1'"
+  tags: openrouter,rest
+openrouter_index:
+  type: string
+  lib: custom
+  description: Splunk index stamped on every event
+  value: "'openrouter'"
+  tags: openrouter,rest
+openrouter_secret_name:
+  type: string
+  lib: custom
+  description: Name of the Cribl text secret holding the OpenRouter management key
+  value: "'openrouter_management_key'"
+  tags: openrouter,rest

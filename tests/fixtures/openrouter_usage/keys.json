@@ -1,0 +1,1 @@
+[{"datatype": "openrouter:keys", "hash": "0000example", "name": "example-key", "label": "sk-or-v1-000...000", "disabled": false, "limit": 20, "limit_remaining": 20, "limit_reset": "weekly", "usage": 0, "usage_daily": 0, "usage_weekly": 0, "usage_monthly": 0, "created_at": "2026-07-16T00:00:00Z", "updated_at": null, "provider": "openrouter"}]

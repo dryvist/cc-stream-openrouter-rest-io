@@ -1,104 +1,48 @@
-# cc-stream-pack-template
+# cc-stream-openrouter-rest-io
 
-Template repository for new Cribl Stream packs. Provides a TypeScript +
-Vitest test harness, Biome lint/format, reusable GitHub Actions workflows, and a
-Makefile that wraps the common day-to-day commands.
+Cribl Stream pack that polls the OpenRouter API with scheduled REST Collectors
+and stamps each event for Splunk.
 
-## What's in the box
+## Collectors
 
-- **Test harness** — Vitest tests that validate route + pipeline behavior against
-  a live Cribl container (auto-discovered fixtures, no test code edits to add cases)
-- **CI** — reusable GitHub Actions workflows for validate + test + release
-- **Lint/format** — Biome with pre-commit hook (lefthook)
-- **Release** — release-please-driven version bumps + `.crbl` artifact upload
+| Job | Endpoint | Schedule (UTC) | Time range | Datatype / sourcetype |
+| --- | --- | --- | --- | --- |
+| `OpenRouter_Activity` | `GET /activity?date=<day>` | `30 1 * * *` | `-1d@d` to `@d`, missed runs resumed | `openrouter:activity` |
+| `OpenRouter_Credits` | `GET /credits` | `5 * * * *` | snapshot | `openrouter:credits` |
+| `OpenRouter_Keys` | `GET /keys?include_disabled=true` | `10 * * * *` | snapshot | `openrouter:keys` |
 
-## Installation
+All three require an OpenRouter management key, read from a Cribl text secret.
+Every collector ships with its schedule disabled.
 
-```sh
-GH_TOKEN=<org-admin-token> \
-  gh repo create dryvist/cc-edge-<source>-io \
-    --template JacobPEvans-personal/cc-stream-pack-template \
-    --public --clone
+`/activity` returns one row per UTC day, model and endpoint for the last 30
+completed days. The job's relative time range is its checkpoint: each run asks
+for the day that ended before it, and `resumeMissed` reruns skipped days.
 
-cd cc-edge-<source>-io
-make install            # installs Node deps + git hooks
-```
+`/keys` uses offset pagination to fetch all available keys in pages of up to
+100. Key creation, disabling and deletion show as differences between
+consecutive snapshots.
 
-Org-repo creation needs a token with `Administration: Read & write` on the
-dryvist org (standard user PATs typically can't). `make install` needs Node
-20+ and pnpm 10+. Docker is only needed for `make test`. See
-[`docs/development.md`](docs/development.md) for the dev shell.
+## Configuration
 
-## After scaffolding
+| Item | Kind | Default |
+| --- | --- | --- |
+| `openrouter_management_key` | Cribl text secret | none; create it on the worker group |
+| `openrouter_secret_name` | pack variable | `openrouter_management_key` |
+| `openrouter_index` | pack variable | `openrouter` |
+| `openrouter_api_base_url` | pack variable | `https://openrouter.ai/api/v1` |
 
-Replace template placeholders before opening your first PR:
+## Output
 
-- `package.json` — `name`, `displayName`, `description`, `tags`, `author`
-- `.github/workflows/test.yml` — flip `pack_type:` from `edge` to `stream` if
-  this is a Cribl Stream pack (default is `edge`)
-- `default/pack.yml` — optional: replace the empty `logo:` with a base64 PNG
-  for the Cribl UI
+The `openrouter_usage` pipeline routes events to index `openrouter` with
+sourcetypes `openrouter:activity`, `openrouter:credits`, and `openrouter:keys`.
+It also sets `host`, `source`, and `_time` (activity rows use the start of
+their UTC day). The route sends to `__group`, so the worker group's routes
+decide the destinations.
 
-Then replace the demo passthrough pipeline (`default/pipelines/passthrough/`)
-and its fixture (`tests/fixtures/passthrough/`) with your pack's real
-pipelines and fixtures.
-
-## Usage
+## Development
 
 ```sh
-make docker-up          # start cribl/cribl test container
-make test               # vitest run (auto-discovers fixtures)
-make typecheck          # tsc --noEmit
-make lint               # biome check
-make format             # biome format --write
-make build              # build .crbl artifact
-make docker-down        # stop test container
+make install
+make docker-up
+make test
 ```
-
-Add a fixture under `tests/fixtures/<pipeline>/<case>.json` and `make test`
-picks it up automatically — no code changes required.
-
-End-to-end proof against a real routing engine (not `/preview`):
-
-```sh
-node --experimental-strip-types e2e/run.ts          # 1000 events in -> counted out
-KEEP=1 node --experimental-strip-types e2e/run.ts   # keep Cribl up afterward:
-                                                    # http://localhost:19000 (admin/admin)
-```
-
-See [`docs/e2e-testing.md`](docs/e2e-testing.md).
-
-## Releases
-
-Don't tag versions manually. release-please opens a PR with the computed
-version bump on every push to `main`; merge that PR to publish a release. See
-[`docs/release-process.md`](docs/release-process.md).
-
-## Documentation
-
-| Doc | What it covers |
-| --- | --- |
-| [`docs/development.md`](docs/development.md) | Local dev setup, Make targets, optional Nix shell |
-| [`docs/test-harness.md`](docs/test-harness.md) | What gets tested, fixture conventions, Cribl version matrix |
-| [`docs/e2e-testing.md`](docs/e2e-testing.md) | Real-container e2e runs, KEEP=1 inspection, CI login options |
-| [`docs/file-boundary.md`](docs/file-boundary.md) | Generic vs pack-specific files (sync rules) |
-| [`docs/release-process.md`](docs/release-process.md) | release-please flow, version bump rules |
-| [`docs/validator-rules.md`](docs/validator-rules.md) | Pack-structure validation rules + how they're enforced |
-| [`.github/README.md`](.github/README.md) | Reusable workflows reference |
-
-## Contributing
-
-Conventional commits required (`feat:`, `fix:`, `chore:`, `docs:`). Branches
-must start with `feat/`, `fix/`, `chore/`, etc. (org ruleset). PRs against
-`main` are squash-merged.
-
-Changes here propagate to every downstream pack — tread carefully. See
-[`AGENTS.md`](AGENTS.md) and [`docs/file-boundary.md`](docs/file-boundary.md).
-
-## License
-
-Apache-2.0 — see [`LICENSE`](LICENSE).
-
----
-
-> Part of a [larger ecosystem of ~40 repos](https://docs.jacobpevans.com) — see how it all fits together.
