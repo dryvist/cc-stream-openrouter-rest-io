@@ -1,0 +1,42 @@
+OpenRouter Data Array:
+  lib: custom
+  minRawLength: 256
+  tags: openrouter
+  rules:
+    - condition: "true"
+      type: json_array
+      timestampAnchorRegex: /^/
+      timestamp:
+        type: current
+        length: 150
+      timestampTimezone: utc
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 51200
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: true
+      name: OpenRouter data array
+      jsonArrayField: data
+      parentFieldsToCopy: []
+OpenRouter Object:
+  lib: custom
+  minRawLength: 256
+  tags: openrouter
+  rules:
+    - condition: "true"
+      type: json
+      timestampAnchorRegex: /^/
+      timestamp:
+        type: current
+        length: 150
+      timestampTimezone: utc
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 51200
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: true
+      name: OpenRouter object

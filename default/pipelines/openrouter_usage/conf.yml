@@ -1,0 +1,25 @@
+output: default
+streamtags: []
+groups: {}
+asyncFuncTimeout: 1000
+description: >-
+  Stamps host, source, sourcetype, index and _time on OpenRouter API events.
+  Activity rows carry a UTC day; they are timed at that day's start.
+functions:
+  - id: eval
+    filter: "true"
+    disabled: false
+    conf:
+      add:
+        - name: host
+          value: "'openrouter.ai'"
+        - name: source
+          value: "source || `openrouter:api:${datatype.split(':')[1]}`"
+        - name: sourcetype
+          value: datatype
+        - name: index
+          value: C.vars.openrouter_index
+        - name: _time
+          value: "date ? Date.parse(date + 'T00:00:00Z') / 1000 : (_time || Date.now() / 1000)"
+      remove:
+        - _raw

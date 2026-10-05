@@ -1,0 +1,265 @@
+OpenRouter_Activity:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: true
+  schedule:
+    cronSchedule: 30 1 * * *
+    maxConcurrentRuns: 1
+    skippable: false
+    resumeMissed: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: '0'
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: 'true'
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking: {}
+      timestampTimezone: UTC
+      earliest: -1d@d
+      latest: '@d'
+    enabled: false
+  streamtags:
+    - openrouter
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 60
+      useRoundRobinDns: false
+      disableTimeFilter: false
+      decodeUrl: true
+      rejectUnauthorized: true
+      captureHeaders: false
+      stopOnEmptyResults: true
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 3
+        multiplier: 2
+        maxIntervalMs: 10000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: true
+        retryHeaderName: retry-after
+      collectUrl: '`${C.vars.openrouter_api_base_url}/activity`'
+      collectRequestParams:
+        - name: date
+          value: C.Time.strftime(earliest, '%Y-%m-%d')
+      collectRequestHeaders:
+        - name: Authorization
+          value: '`Bearer ${C.Secret(C.vars.openrouter_secret_name, ''text'').value}`'
+      authRequestHeaders: []
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: 10 MB
+    breakerRulesets:
+      - OpenRouter Data Array
+    metadata:
+      - name: datatype
+        value: '''openrouter:activity'''
+      - name: provider
+        value: '''openrouter'''
+  savedState: {}
+  description: Daily per-model activity for the previous completed UTC day (GET /activity, management key). The scheduler's
+    relative range -1d@d..@d is the checkpoint; resumeMissed backfills skipped days inside the API's 30-day window.
+  notifications: []
+OpenRouter_Credits:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: true
+  schedule:
+    cronSchedule: 5 * * * *
+    maxConcurrentRuns: 1
+    skippable: false
+    resumeMissed: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: '0'
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: 'true'
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking: {}
+      timestampTimezone: UTC
+    enabled: false
+  streamtags:
+    - openrouter
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: none
+      authentication: none
+      timeout: 60
+      useRoundRobinDns: false
+      disableTimeFilter: true
+      decodeUrl: true
+      rejectUnauthorized: true
+      captureHeaders: false
+      stopOnEmptyResults: true
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 3
+        multiplier: 2
+        maxIntervalMs: 10000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: true
+        retryHeaderName: retry-after
+      collectUrl: '`${C.vars.openrouter_api_base_url}/credits`'
+      collectRequestParams: []
+      collectRequestHeaders:
+        - name: Authorization
+          value: '`Bearer ${C.Secret(C.vars.openrouter_secret_name, ''text'').value}`'
+      authRequestHeaders: []
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: 10 MB
+    breakerRulesets:
+      - OpenRouter Object
+    metadata:
+      - name: datatype
+        value: '''openrouter:credits'''
+      - name: provider
+        value: '''openrouter'''
+  savedState: {}
+  description: Hourly snapshot of total credits and total usage (GET /credits, management key).
+  notifications: []
+OpenRouter_Keys:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: true
+  schedule:
+    cronSchedule: 10 * * * *
+    maxConcurrentRuns: 1
+    skippable: false
+    resumeMissed: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: '0'
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: 'true'
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking: {}
+      timestampTimezone: UTC
+    enabled: false
+  streamtags:
+    - openrouter
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      pagination:
+        type: request_offset
+        offsetField: offset
+        limitField: limit
+        limit: 100
+        maxPages: 0
+        zeroIndexed: true
+        pageField: page
+        sizeField: size
+        size: 100
+        offset: 0
+        page: 1
+        attribute: []
+      authentication: none
+      timeout: 60
+      useRoundRobinDns: false
+      disableTimeFilter: true
+      decodeUrl: true
+      rejectUnauthorized: true
+      captureHeaders: false
+      stopOnEmptyResults: true
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 3
+        multiplier: 2
+        maxIntervalMs: 10000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: true
+        retryHeaderName: retry-after
+      collectUrl: '`${C.vars.openrouter_api_base_url}/keys`'
+      collectRequestParams:
+        - name: include_disabled
+          value: '''true'''
+      collectRequestHeaders:
+        - name: Authorization
+          value: '`Bearer ${C.Secret(C.vars.openrouter_secret_name, ''text'').value}`'
+      authRequestHeaders: []
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: 10 MB
+    breakerRulesets:
+      - OpenRouter Data Array
+    metadata:
+      - name: datatype
+        value: '''openrouter:keys'''
+      - name: provider
+        value: '''openrouter'''
+  savedState: {}
+  description: Hourly key inventory with per-key usage, limits and disabled state (GET /keys, management key). Offset pagination
+    fetches all 100-key pages; key create, disable and delete events are derived by diffing snapshots.
+  notifications: []

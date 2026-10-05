@@ -1,0 +1,1 @@
+[{"datatype": "openrouter:activity", "date": "2026-10-02", "model": "example/model-a", "model_permaslug": "example/model-a-2026", "endpoint_id": "ep-0001", "provider_name": "ExampleProvider", "usage": 0.0123, "byok_usage_inference": 0, "requests": 12, "prompt_tokens": 34000, "completion_tokens": 2100, "reasoning_tokens": 0, "cached_tokens": 1200, "provider": "openrouter"}]
