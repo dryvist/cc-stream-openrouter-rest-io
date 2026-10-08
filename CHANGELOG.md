@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/dryvist/cc-stream-openrouter-rest-io/compare/v1.0.1...v1.0.2) (2026-10-08)
+
+
+### Bug Fixes
+
+* **ci:** set the repository for the draft publish step ([#6](https://github.com/dryvist/cc-stream-openrouter-rest-io/issues/6)) ([8b67981](https://github.com/dryvist/cc-stream-openrouter-rest-io/commit/8b67981b8314be8a8a7cb113b3645af9da877f94))
+
 ## [1.0.1](https://github.com/dryvist/cc-stream-openrouter-rest-io/compare/v1.0.0...v1.0.1) (2026-10-08)
 
 
