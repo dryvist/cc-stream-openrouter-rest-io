@@ -1,6 +1,6 @@
 {
   "name": "cc-stream-openrouter-rest-io",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minLogStreamVersion": "4.16.0",
   "author": "dryvist",
   "description": "Cribl Stream pack that polls the OpenRouter API (daily activity per model, credit balance, key inventory) with scheduled REST Collectors and stamps the events for Splunk.",
