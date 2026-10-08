@@ -6,6 +6,8 @@
     ".": {
       "package-name": "cc-edge-pack-template",
       "changelog-path": "CHANGELOG.md",
+      "draft": true,
+      "force-tag-creation": true,
       "extra-files": [
         "package.json"
       ]
