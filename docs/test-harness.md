@@ -43,11 +43,12 @@ tests stop running. No code changes.
 
 Default: `latest` plus the last patches of the previous two minors (N / N-1 /
 N-2). `latest` is required; older legs are best-effort. Shape lives in the
-`cribl_versions` input default in `.github/workflows/cribl-pack-test.yml` —
-edit the JSON there to bump, add, or remove versions. Each leg posts its own
-status check (`Test pack pipelines (Cribl <version>)`) so branch protection
-can require `latest` specifically. When `latest` rolls over to a new minor,
-bump both older entries forward one.
+`cribl_versions` input default of the reusable test workflow in
+`dryvist/cc-edge-pack-template` — edit the JSON there to bump, add, or
+remove versions. Each leg posts its own status check
+(`Test pack pipelines (Cribl <version>)`) so branch protection can require
+`latest` specifically. When `latest` rolls over to a new minor, bump both
+older entries forward one.
 
 ## Required-fields assertion
 
