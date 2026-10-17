@@ -11,7 +11,8 @@ Edit only here in the template; updates propagate when packs sync.
   `tests/test-helpers.ts`, `tests/routes.test.ts`, `tests/pipelines.test.ts`
 - `tests/package.json`, `tests/tsconfig.json`, `tests/vitest.config.ts`,
   `tests/pnpm-lock.yaml`
-- `scripts/build-crbl.sh`, `scripts/validate-pack-structure.sh`
+- Shared CI scripts live in `jpe-cribl/.github/scripts/` and run from the
+  shared workflows; CI checks them out under `.gh-shared/`.
 - `biome.jsonc`, `.editorconfig`, `lefthook.yml`, `.yamllint.yml`
 - `Makefile`, `docker-compose.yml`
 - `.github/workflows/test.yml` (caller — only `pack_type:` value changes per pack)

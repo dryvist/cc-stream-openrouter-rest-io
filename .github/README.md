@@ -1,21 +1,16 @@
-# `.github/` — workflows for this template
+# `.github/` — workflows for this pack
 
-Reusable GitHub Actions workflows are callable from any dryvist Cribl pack.
-Caller workflows in this repo (`test.yml`, `release.yml`) wire them up to
-GitHub events.
+This repository calls pinned reusable workflows from `jpe-cribl/.github`.
+Caller workflows in this repo (`test.yml`, `release.yml`, `e2e.yml`) wire them
+up to GitHub events.
 
 ## Installation
 
-These workflows install themselves implicitly when a new pack scaffolds from
-`dryvist/cc-edge-pack-template` (`gh repo create --template`). The caller
-workflows under `.github/workflows/` are copied verbatim; the reusable
-workflows they reference resolve at runtime against
-`dryvist/cc-edge-pack-template/.github/workflows/<file>@<40-hex-sha> # vX.Y.Z`.
-
-If you're adding a workflow to a non-template repo manually, copy the relevant
-caller from this directory into your repo's `.github/workflows/` and adjust
-the `uses:` ref to pin a different template release. Pack-local reusable
-workflows are pinned to their commit SHA; the shared workflow homes use `@v1`.
+The caller workflows under `.github/workflows/` reference the shared workflows
+at `jpe-cribl/.github/.github/workflows/<file>@<40-hex-sha> # main`. The shared
+test workflow checks the shared scripts out to `.gh-shared` for both its
+validate and test jobs; the shared release workflow uses those scripts from its
+own checkout.
 
 ## Usage
 
@@ -34,10 +29,10 @@ test specific upstream Cribl releases).
 
 ## Reusable workflows
 
-The pack test and release workflows are reusable workflows hosted in
-[`dryvist/cc-edge-pack-template`](https://github.com/dryvist/cc-edge-pack-template)
-(`cribl-pack-test.yml`, `cribl-pack-release.yml`); their inputs and jobs
-are documented there.
+The pack test, release, and e2e workflows are reusable workflows hosted in
+[`jpe-cribl/.github`](https://github.com/jpe-cribl/.github)
+(`cribl-pack-test.yml`, `cribl-pack-release.yml`, `cribl-pack-e2e.yml`); their
+inputs and jobs are documented there.
 
 ## Caller workflows in this repo
 
@@ -45,6 +40,7 @@ are documented there.
 | --- | --- | --- |
 | `test.yml` | path-filtered PR + main push | central pack-test |
 | `release.yml` | main push + PR | central release + pack assets |
+| `e2e.yml` | manual dispatch + e2e path-filtered PR | shared cribl-pack-e2e |
 
 ## Updating reusable workflow inputs
 
