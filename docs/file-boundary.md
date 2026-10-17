@@ -14,8 +14,6 @@ Edit only here in the template; updates propagate when packs sync.
 - `scripts/build-crbl.sh`, `scripts/validate-pack-structure.sh`
 - `biome.jsonc`, `.editorconfig`, `lefthook.yml`, `.yamllint.yml`
 - `Makefile`, `docker-compose.yml`
-- `.github/workflows/cribl-pack-test.yml` (reusable)
-- `.github/workflows/cribl-pack-release.yml` (reusable)
 - `.github/workflows/test.yml` (caller — only `pack_type:` value changes per pack)
 - `.github/workflows/release.yml`
 
