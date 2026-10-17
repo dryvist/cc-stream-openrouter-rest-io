@@ -1,9 +1,8 @@
 # `.github/` — workflows for this template
 
-Reusable GitHub Actions workflows callable from any dryvist Cribl pack via
-`uses: dryvist/cc-edge-pack-template/.github/workflows/<file>@<40-hex commit SHA> # vX.Y.Z`. Caller
-workflows in this repo (`test.yml`, `release.yml`, `release-please.yml`) wire
-them up to GitHub events.
+Reusable GitHub Actions workflows are callable from any dryvist Cribl pack.
+Caller workflows in this repo (`test.yml`, `release.yml`) wire them up to
+GitHub events.
 
 ## Installation
 
@@ -15,8 +14,8 @@ workflows they reference resolve at runtime against
 
 If you're adding a workflow to a non-template repo manually, copy the relevant
 caller from this directory into your repo's `.github/workflows/` and adjust
-the `uses:` ref to pin a different template release. First-party reusable workflows are
-always referenced as `@<40-hex-sha> # vX.Y.Z`.
+the `uses:` ref to pin a different template release. Pack-local reusable
+workflows are pinned to their commit SHA; the shared workflow homes use `@v1`.
 
 ## Usage
 
@@ -24,9 +23,10 @@ Once installed, the workflows trigger automatically:
 
 - Open a PR touching `default/`, `data/samples/`, `tests/`, `scripts/`, or
   `package.json` → `test.yml` runs validate + Vitest.
-- Push to `main` → `release-please.yml` opens or updates the release PR.
-- Merge a release PR → release-please tags the version, which triggers
-  `release.yml` → builds the `.crbl` and publishes to GitHub Releases.
+- Push to `main` → `release.yml` calls central `_release.yml` to open or update
+  the release PR.
+- Repository-specific asset and publish jobs remain in `release.yml` and call
+  the pack release workflow as needed.
 
 No manual invocation is needed. Override defaults by editing the caller
 workflow's `with:` block (e.g., pass a custom `cribl_versions` JSON array to
@@ -41,10 +41,13 @@ Validates pack structure + runs the TypeScript Vitest suite against one
 
 | Input | Required | Default | Purpose |
 | --- | --- | --- | --- |
-| `pack_type` | yes | — | `edge` or `stream` (drives validator naming convention + required-fields assertion) |
-| `cribl_versions` | no | `latest` + N-1/N-2 last patches | JSON array of `{version, required}`; one leg each; `required: false` is best-effort |
+| `pack_type` | yes | — | `edge` or `stream`; selects checks and names. |
+| `cribl_versions` | no | latest, N-1/N-2 | Version matrix. |
 | `node_version` | no | `lts/*` | Node.js version |
 | `yq_version` | no | `4.44.5` | Pinned `mikefarah/yq` version |
+
+Each version entry is a JSON object with `version` and `required`. Set
+`required: false` for best-effort entries.
 
 Jobs:
 
@@ -61,20 +64,17 @@ Jobs:
 Builds a `.crbl` tarball via `scripts/build-crbl.sh` and publishes it to
 GitHub Releases (`softprops/action-gh-release`).
 
-| Input | Required | Default | Purpose |
-| --- | --- | --- | --- |
-| `additional_files` | no | `''` | Space-separated extra files for the tarball; `LICENSE` is added if present |
+- `additional_files` (optional; defaults to empty): space-separated extra
+  tarball files. `LICENSE` is included when present.
 
-Triggered by tag push in the calling workflow (typically by release-please
-when a release PR merges).
+A tag push triggers this workflow, usually after release-please merges a PR.
 
 ## Caller workflows in this repo
 
 | File | Trigger | Calls |
 | --- | --- | --- |
-| `workflows/test.yml` | PR + push to main (paths-filtered) | `cribl-pack-test.yml` (this repo) |
-| `workflows/release.yml` | semver tag push (`vX.Y.Z`, plus `-RCn`/`-TCn` prereleases) | `cribl-pack-release.yml` (this repo) |
-| `workflows/release-please.yml` | push to main | `_release-please.yml` (inherited from `dryvist/.github`) |
+| `test.yml` | path-filtered PR + main push | central pack-test |
+| `release.yml` | main push + PR | central release + pack assets |
 
 ## Updating reusable workflow inputs
 
@@ -85,7 +85,7 @@ absolutely cannot.
 
 ## Pinning external actions
 
-Per [`SECURITY.md`](https://github.com/dryvist/.github/blob/main/SECURITY.md):
+Per [`SECURITY.md`](https://github.com/JacobPEvans/.github/blob/main/SECURITY.md):
 
 - Trusted (`actions/*`, `pnpm/action-setup`, `softprops/action-gh-release`):
   semver tag pins (`@v4`, etc.)
