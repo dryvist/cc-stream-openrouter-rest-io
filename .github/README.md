@@ -34,40 +34,10 @@ test specific upstream Cribl releases).
 
 ## Reusable workflows
 
-### `cribl-pack-test.yml`
-
-Validates pack structure + runs the TypeScript Vitest suite against one
-`cribl/cribl` service container per entry in the `cribl_versions` matrix.
-
-| Input | Required | Default | Purpose |
-| --- | --- | --- | --- |
-| `pack_type` | yes | — | `edge` or `stream`; selects checks and names. |
-| `cribl_versions` | no | latest, N-1/N-2 | Version matrix. |
-| `node_version` | no | `lts/*` | Node.js version |
-| `yq_version` | no | `4.44.5` | Pinned `mikefarah/yq` version |
-
-Each version entry is a JSON object with `version` and `required`. Set
-`required: false` for best-effort entries.
-
-Jobs:
-
-1. **validate** — installs `yq` (pinned via `dcarbone/install-yq-action`),
-   lints YAML (`frenck/action-yamllint`, config from `.yamllint.yml`), runs
-   `scripts/validate-pack-structure.sh`.
-2. **test** (matrix) — per Cribl version: sets up Node + pnpm (cached),
-   installs deps, runs Biome lint, typechecks, waits for Cribl health
-   endpoint (`iFaxity/wait-on-action`), runs `pnpm run test`. Each leg posts
-   its own status check (`Test pack pipelines (Cribl <version>)`).
-
-### `cribl-pack-release.yml`
-
-Builds a `.crbl` tarball via `scripts/build-crbl.sh` and publishes it to
-GitHub Releases (`softprops/action-gh-release`).
-
-- `additional_files` (optional; defaults to empty): space-separated extra
-  tarball files. `LICENSE` is included when present.
-
-A tag push triggers this workflow, usually after release-please merges a PR.
+The pack test and release workflows are reusable workflows hosted in
+[`dryvist/cc-edge-pack-template`](https://github.com/dryvist/cc-edge-pack-template)
+(`cribl-pack-test.yml`, `cribl-pack-release.yml`); their inputs and jobs
+are documented there.
 
 ## Caller workflows in this repo
 
