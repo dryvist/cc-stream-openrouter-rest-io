@@ -1,9 +1,8 @@
 # `.github/` — workflows for this template
 
-Reusable GitHub Actions workflows callable from any dryvist Cribl pack via
-`uses: dryvist/cc-edge-pack-template/.github/workflows/<file>@<40-hex commit SHA> # vX.Y.Z`. Caller
-workflows in this repo (`test.yml`, `release.yml`) wire
-them up to GitHub events.
+Reusable GitHub Actions workflows are callable from any dryvist Cribl pack.
+Caller workflows in this repo (`test.yml`, `release.yml`) wire them up to
+GitHub events.
 
 ## Installation
 
@@ -42,10 +41,13 @@ Validates pack structure + runs the TypeScript Vitest suite against one
 
 | Input | Required | Default | Purpose |
 | --- | --- | --- | --- |
-| `pack_type` | yes | — | `edge` or `stream` (drives validator naming convention + required-fields assertion) |
-| `cribl_versions` | no | `latest` + N-1/N-2 last patches | JSON array of `{version, required}`; one leg each; `required: false` is best-effort |
+| `pack_type` | yes | — | `edge` or `stream`; selects checks and names. |
+| `cribl_versions` | no | latest, N-1/N-2 | Version matrix. |
 | `node_version` | no | `lts/*` | Node.js version |
 | `yq_version` | no | `4.44.5` | Pinned `mikefarah/yq` version |
+
+Each version entry is a JSON object with `version` and `required`. Set
+`required: false` for best-effort entries.
 
 Jobs:
 
@@ -62,19 +64,17 @@ Jobs:
 Builds a `.crbl` tarball via `scripts/build-crbl.sh` and publishes it to
 GitHub Releases (`softprops/action-gh-release`).
 
-| Input | Required | Default | Purpose |
-| --- | --- | --- | --- |
-| `additional_files` | no | `''` | Space-separated extra files for the tarball; `LICENSE` is added if present |
+- `additional_files` (optional; defaults to empty): space-separated extra
+  tarball files. `LICENSE` is included when present.
 
-Triggered by tag push in the calling workflow (typically by release-please
-when a release PR merges).
+A tag push triggers this workflow, usually after release-please merges a PR.
 
 ## Caller workflows in this repo
 
 | File | Trigger | Calls |
 | --- | --- | --- |
-| `workflows/test.yml` | PR + push to main (paths-filtered) | `cribl-pack-test.yml` (this repo) |
-| `workflows/release.yml` | push to main + PR | `_release.yml` (central) and the pack asset workflow |
+| `test.yml` | path-filtered PR + main push | central pack-test |
+| `release.yml` | main push + PR | central release + pack assets |
 
 ## Updating reusable workflow inputs
 
