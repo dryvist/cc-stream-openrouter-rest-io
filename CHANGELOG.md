@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/dryvist/cc-stream-openrouter-rest-io/compare/v1.0.2...v1.0.3) (2026-10-24)
+
+
+### Bug Fixes
+
+* enforce seven-day pnpm release age ([#45](https://github.com/dryvist/cc-stream-openrouter-rest-io/issues/45)) ([46c1907](https://github.com/dryvist/cc-stream-openrouter-rest-io/commit/46c1907c93a64714b4cffd03b1d10443b41f041f))
+
 ## [1.0.2](https://github.com/dryvist/cc-stream-openrouter-rest-io/compare/v1.0.1...v1.0.2) (2026-10-08)
 
 
